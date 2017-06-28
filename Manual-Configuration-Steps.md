@@ -17,8 +17,8 @@ There are two projects in this sample.  Each project needs to be separately regi
 1. Sign in to the [Azure portal](https://portal.azure.com).
 2. On the top bar, click on your account and under the **Directory** list, choose the Active Directory tenant where you wish to register your application.
 2. Click on **More Services** in the left hand nav, and choose **Azure Active Directory**.
-3. Click on **App registrations** and choose **Add**.
-4. Enter a friendly name for the application, for example 'TodoListService-Core' and select 'Web Application and/or Web API' as the Application Type. For the sign-on URL, enter the base URL for the sample, which is by default `https://localhost:44321`. For the App ID URI, enter `https://<your_tenant_name>/TodoListService-Core`, replacing `<your_tenant_name>` with the name of your Azure AD tenant. Click on **Create** to create the application.
+3. Click on **App registrations** and choose **New application registration**.
+4. Enter a friendly name for the application, for example 'TodoListService-Core' and select *'Web app / API'* as the Application Type. For the sign-on URL, enter the base URL for the sample, which is by default `https://localhost:44341`. Click on **Create** to create the application.
 5. While still in the Azure portal, choose your application, click on **Settings** and choose **Properties**.
 6. Find the Application ID value and copy it to the clipboard.
 
@@ -28,9 +28,9 @@ There are two projects in this sample.  Each project needs to be separately regi
 1. Sign in to the [Azure portal](https://portal.azure.com).
 2. On the top bar, click on your account and under the **Directory** list, choose the Active Directory tenant where you wish to register your application.
 2. Click on **More Services** in the left hand nav, and choose **Azure Active Directory**.
-3. Click on **App registrations** and choose **Add**.
-4. Enter a friendly name for the application, for example 'TodoListDaemonWithCert' and select *'Web Application and/or Web API'* as the Application Type (even if here we have a console application). 
-5. Since this application is a daemon and not a web application, it doesn't have a sign-in URL or app ID URI.  For these two fields, enter "http://TodoListDaemonWithCert-Core". Click on **Create** to create the application.
+3. Click on **App registrations** and choose **New application registration**.
+4. Enter a friendly name for the application, for example 'TodoListDaemonWithCert' and select *'Web app / API'* as the Application Type (even if here we have a console application). 
+5. Since this application is a daemon and not a web application, it doesn't have a sign-in URL.  For this field, enter "http://TodoListDaemonWithCert-Core". Click on **Create** to create the application.
 6. While still in the Azure portal, choose your application, click on **Settings** and choose **Properties**.
 7. Find the Application ID value and copy it to the clipboard.
 
@@ -91,7 +91,7 @@ Note that the `keyCredentials` property is multi-valued, so you may upload multi
 
 ### Step 2:  Configure the sample to use your Azure AD tenant
 
-#### Configure the TodoListDaemon-Core project
+#### Configure the TodoListDaemonWithCert-Core project
 
 1. Open the `appsettings.json`.
 2. Find the app key `Tenant` and replace the value with your AAD tenant name.

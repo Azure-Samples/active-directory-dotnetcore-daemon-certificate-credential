@@ -33,10 +33,10 @@ You can clone this repository from Visual Studio. Alternatively, from your shell
 
 > Note that the names of the repository and the project are pretty long. On Windows, you probably want to clone this repository close to a disk root. 
 
-### Step 2:  Register the sample with your Azure Active Directory tenant and configure the code accordingly
+### Step 2:  Register the sample with your Azure Active Directory tenant, create a certificate and configure the code
 
 There are two options:
- - Option 1: you run the `Configure.ps1` PowerShell script which creates two applications in the Azure Active Directory, (one for the client and one for the service), and then updates the configuration files in the Visual Studio projects to point to those two newly created apps
+ - Option 1: you run the `Configure.ps1` PowerShell script which creates two applications in the Azure Active Directory, (one for the client and one for the service), creates a certificate on your local machine, and then updates the configuration files in the Visual Studio projects to point to the newly created apps and certificate.
  - Option 2: you do the same manually.
 
 If you want to understand in more depth what needs to be done in the Azure portal, and how to change the code (Option 2), please have a look at [Manual-Configuration-Steps.md](./Manual-Configuration-Steps.md). Otherwise (Option 1), the steps to use the PowerShell are the following:
@@ -56,9 +56,9 @@ If you have access to multiple Azure Active Directory tenants, you must specify 
  
  3. Now run the script.
 
-  `.\Configure.ps1 <tenant ID>`
+  `.\Configure.ps1 -tenantId <tenant ID>`
 
-  Replace `<tenantID>` with the tenant ID that you previously copied from the Azure portal.
+  Replace `<tenant ID>` with the tenant ID that you previously copied from the Azure portal.
   
  4. When requested, sign-in with the username and password of a user who has permissions to create applications in the AAD tenant.
 
@@ -83,7 +83,7 @@ See [Get Started with .NET Core](https://www.microsoft.com/net/core#windowsvs201
 ### (Optional) Step 4:  Clean up the applications in the Azure AD tenant
 When you are done with running and understanding the sample, if you want to remove your Applications from AD just run:
 
-`.\Cleanup.ps1 <tenant ID>`
+`.\Cleanup.ps1 -tenantId <tenant ID>`
 
 Replace with the tenant ID that you previously copied from the Azure portal.
 If you do that you also probably want to undo the changes in the `appsettings.json` files.
