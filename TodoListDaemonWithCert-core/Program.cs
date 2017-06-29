@@ -58,6 +58,7 @@ namespace TodoListDaemonWithCert
             X509Certificate2 cert = ReadCertificateFromStore(config.CertName);
             if (cert == null)
             {
+                Console.WriteLine($"Cannot find active certificate '{config.CertName}' in certificates for current user. Please check configuration");
                 return -1;
             }
 
@@ -65,12 +66,13 @@ namespace TodoListDaemonWithCert
             certCred = new ClientAssertionCertificate(config.ClientId, cert);
 
             // Call the ToDoList service 10 times with short delay between calls.
+            int delay = 1000;
             for (int i = 0; i < 10; i++)
             {
-                Thread.Sleep(3000);
                 PostNewTodoItem().Wait();
-                Thread.Sleep(3000);
+                Thread.Sleep(delay);
                 DisplayTodoList().Wait();
+                Thread.Sleep(delay);
             }
             return errorCode;
         }
