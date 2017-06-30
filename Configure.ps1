@@ -24,7 +24,7 @@
 # 6) Optionaly if you want to cleanup the applications in the Azure AD, run:
 #      CleanUp $apps
 #    The applications are un-registered
-param([PSCredential]$Credential="", [string]$TenantId="")
+param([Parameter(Mandatory=$false)][PSCredential]$Credential=$null, [Parameter(Mandatory=$true)][string]$TenantId)
 Import-Module AzureAD
 $ErrorActionPreference = 'Stop'
 
@@ -84,20 +84,9 @@ so that they are consistent with the Applications parameters
     }
     else
     {
-        if (!$TenantId)
-        {
-            $creds = Connect-AzureAD -Credential $Credential
-        }
-        else
-        {
-            $creds = Connect-AzureAD -TenantId $tenantId -Credential $Credential
-        }
+        $creds = Connect-AzureAD -TenantId $tenantId -Credential $Credential
     }
 
-    if (!$tenantId)
-    {
-        $tenantId = $creds.Tenant.Id
-    }
     $tenant = Get-AzureADTenantDetail
     $tenantName =  $tenant.VerifiedDomains[0].Name
 
