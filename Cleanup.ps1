@@ -1,4 +1,4 @@
-param([PSCredential]$Credential, [string]$TenantId)
+param([Parameter(Mandatory=$false)][PSCredential]$Credential=$null, [Parameter(Mandatory=$true)][string]$TenantId)
 Import-Module AzureAD
 $ErrorActionPreference = 'Stop'
 
@@ -29,20 +29,9 @@ This function removes the Azure AD applications for the sample. These applicatio
     }
     else
     {
-        if (!$tenantId)
-        {
-            $creds = Connect-AzureAD -Credential $Credential
-        }
-        else
-        {
-            $creds = Connect-AzureAD -TenantId $tenantId -Credential $Credential
-        }
+        $creds = Connect-AzureAD -TenantId $tenantId -Credential $Credential
     }
 
-    if (!$tenantId)
-    {
-        $tenantId = $creds.Tenant.Id
-    }
     $tenant = Get-AzureADTenantDetail
     $tenantName =  $tenant.VerifiedDomains[0].Name
 

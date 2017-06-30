@@ -20,7 +20,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
- */ 
+ */
 
 // The following using statements were added for this sample.
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
@@ -47,7 +47,7 @@ namespace TodoListDaemonWithCert
 
         static int Main(string[] args)
         {
-            // Return code so that exceptions provoke a non null return code for the daemon
+            // Return code so that exceptions provoke a non-null return code for the daemon
             errorCode = 0;
 
             // Create the authentication context to be used to acquire tokens.
@@ -81,7 +81,6 @@ namespace TodoListDaemonWithCert
         /// <summary>
         /// Reads the certificate
         /// </summary>
-        /// <returns></returns>
         private static X509Certificate2 ReadCertificateFromStore(string certName)
         {
             X509Certificate2 cert = null;
@@ -107,7 +106,6 @@ namespace TodoListDaemonWithCert
         /// Get an access token from Azure AD using client credentials.
         /// If the attempt to get a token fails because the server is unavailable, retry twice after 3 seconds each
         /// </summary>
-        /// <returns></returns>
         private static async Task<AuthenticationResult> GetAccessToken(string todoListResourceId)
         {
             AuthenticationResult result = null;
@@ -117,14 +115,15 @@ namespace TodoListDaemonWithCert
             do
             {
                 retry = false;
+                errorCode = 0;
+
                 try
-                {   // ADAL includes an in memory cache, so this call will only send a message to the server if the cached token is expired.
+                {   // ADAL includes an in-memory cache, so this call will only send a message to the server if the cached token is expired.
                     result = await authContext.AcquireTokenAsync(todoListResourceId, certCred);
                 }
-                catch (Exception ex)
+                catch (AdalException ex)
                 {
-                    AdalException exc = ex as AdalException;
-                    if (exc.ErrorCode == "temporarily_unavailable")
+                    if (ex.ErrorCode == "temporarily_unavailable")
                     {
                         retry = true;
                         retryCount++;
