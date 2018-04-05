@@ -1,7 +1,7 @@
 ﻿/*
  The MIT License (MIT)
 
-Copyright (c) 2018 Microsoft Corporation
+Copyright (c) 2015 Microsoft Corporation
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -21,29 +21,35 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-
-using System;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+using TodoListService.Models;
 
-namespace TodoListService_Core
+namespace TodoListService_Core.Controllers
 {
-    public class Program
+    [Authorize]
+    [Route("api/[controller]")]
+    public class TodoListController : Controller
     {
-        public static void Main(string[] args)
+        static ConcurrentBag<TodoItem> todoBag = new ConcurrentBag<TodoItem>();
+
+        // GET: api/values
+        [HttpGet]
+        public IEnumerable<TodoItem> Get()
         {
-            BuildWebHost(args).Run();
+            return todoBag;
         }
 
-        public static IWebHost BuildWebHost(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>()
-                .Build();
+        // POST api/values
+        [HttpPost]
+        public void Post(TodoItem todo)
+        {
+            if (null != todo && !string.IsNullOrWhiteSpace(todo.Title))
+            {
+                todoBag.Add(new TodoItem { Title = todo.Title, Owner = "anybody"});
+            }
+        }
     }
 }

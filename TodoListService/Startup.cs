@@ -1,5 +1,5 @@
-﻿/* 
-The MIT License (MIT)
+﻿/*
+ The MIT License (MIT)
 
 Copyright (c) 2018 Microsoft Corporation
 
@@ -35,7 +35,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace TodoListService_Core
+namespace TodoListService
 {
     public class Startup
     {
