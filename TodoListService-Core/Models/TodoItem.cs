@@ -22,11 +22,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 
-namespace TodoListServiceCore.Models
+namespace TodoListService_Core.Models
 {
     public class TodoItem
     {
-        public string Title { get; set; }
         public string Owner { get; set; }
+        public string Title { get; set; }
     }
 }
