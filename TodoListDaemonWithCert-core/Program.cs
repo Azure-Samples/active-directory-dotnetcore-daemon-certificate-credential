@@ -54,6 +54,9 @@ namespace TodoListDaemonWithCert
             config = AuthenticationConfig.ReadFromJsonFile("appsettings.json");
             authContext = new AuthenticationContext(config.Authority);
 
+            // See bug https://github.com/AzureAD/azure-activedirectory-library-for-dotnet/issues/1028
+            LoggerCallbackHandler.UseDefaultLogging = false;
+
             // Initialize the Certificate Credential to be used by ADAL.
             X509Certificate2 cert = ReadCertificateFromStore(config.CertName);
             if (cert == null)
