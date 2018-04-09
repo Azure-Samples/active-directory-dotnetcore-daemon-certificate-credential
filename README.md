@@ -50,7 +50,7 @@ You can clone this repository from Visual Studio. Alternatively, from your shell
 
 `git clone https://github.com/Azure-Samples/active-directory-dotnetcore-daemon-certificate-credential.git`
 
-> Note that the names of the repository and the project are pretty long. On Windows, you probably want to clone this repository close to a disk root.
+> Given that the name of the sample is pretty long, and so are the name of the referenced NuGet pacakges, you might want to clone it in a folder close to the root of your hard drive, to avoid file size limitations on Windows.
 
 ### Step 2:  Register the sample with your Azure Active Directory tenant, create a certificate, and configure the code
 
@@ -61,7 +61,7 @@ There are two projects in this sample. Each needs to be separately registered in
   - **automatically** create for you the Azure AD applications and related objects (passwords, permissions, dependencies)
   - modify the Visual Studio projects' configuration files.
 
-If you want to do use this automation, read the instructions in [App Creation Scripts](./AppCreationScripts/AppCreationScripts.md)
+If you want to use this automation, read the instructions in [App Creation Scripts](./AppCreationScripts/AppCreationScripts.md)
 
 > For Windows Server 2012, creating a certificate with PowerShell is slightly different: See issue [#37](https://github.com/Azure-Samples/active-directory-dotnet-daemon-certificate-credential/issues/37)
 
@@ -72,6 +72,9 @@ As a first step you'll need to:
 1. Sign in to the [Azure portal](https://portal.azure.com).
 1. On the top bar, click on your account and under the **Directory** list, choose the Active Directory tenant where you wish to register your application.
 1. Click on **All services** in the left-hand nav, and choose **Azure Active Directory**.
+
+> In the next steps, you might need the tenant name (or directory name) or the tenant ID (or directory ID). These are presented in the **Properties**
+  of the Azure Active Directory window respectively as *Name* and *Directory ID*
 
 #### Register the service app (TodoListService)
 
@@ -92,7 +95,7 @@ As a first step you'll need to:
 
 #### Create a self-signed certificate
 
-To complete this step you will use the `New-SelfSignedCertificate` Powershell command. You can find more information about the New-SelfSignedCertificat command [here](https://technet.microsoft.com/library/hh848633).
+To complete this step, you will use the `New-SelfSignedCertificate` Powershell command. You can find more information about the New-SelfSignedCertificat command [here](https://technet.microsoft.com/library/hh848633).
 
 Open PowerShell and run New-SelfSignedCertificate with the following parameters to create a self-signed certificate in the user certificate store on your computer:
 
@@ -156,14 +159,14 @@ In the steps below, ClientID is the same as Application ID or AppId.
 
 Open the solution in Visual Studio to configure the projects
 
-### Configure the service project
+#### Configure the service project
 
 1. Open the `TodoListService\appsettings.json` file
 1. Find the app key `Domain` and replace the existing value with your AAD tenant name.
 1. Find the app key `TenantId` and replace the existing value with Tenant ID.
 1. Find the app key `ClientId` and replace the existing value with the application ID (clientId) of the `TodoListService` application copied from the Azure portal.
 
-### Configure the client project
+#### Configure the client project
 
 1. Open the `TodoListDaemonWithCert-Core\appsettings.json` file
 1. Find the app key `Tenant` and replace the existing value with your AAD tenant name.
@@ -196,7 +199,7 @@ This project has one WebApp / Web API projects. To deploy them to Azure Web Site
 
 - create an Azure Web Site
 - publish the Web App / Web APIs to the web site, and
-- update it client(s) to call the web site instead of IIS Express.
+- update its client(s) to call the web site instead of IIS Express.
 
 ### Create and Publish the `TodoListService` to an Azure Web Site
 
@@ -277,7 +280,7 @@ Use [Stack Overflow](http://stackoverflow.com/questions/tagged/adal) to get supp
 Ask your questions on Stack Overflow first and browse existing issues to see if someone has asked your question before.
 Make sure that your questions or comments are tagged with [`adal` `dotnet`].
 
-If you find and bug in the sample, please raise the issue on [GitHub Issues](../../issues).
+If you find a bug in the sample, please raise the issue on [GitHub Issues](../../issues).
 
 To provide a recommendation, visit the following [User Voice page](https://feedback.azure.com/forums/169401-azure-active-directory).
 
