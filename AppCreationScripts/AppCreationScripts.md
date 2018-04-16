@@ -73,8 +73,8 @@ When you know the indentity and credentials of the user in the name of whom you 
 ```PowerShell
 $secpasswd = ConvertTo-SecureString "[Password here]" -AsPlainText -Force
 $mycreds = New-Object System.Management.Automation.PSCredential ("[login@tenantName here]", $secpasswd)
-. .\Cleanup.ps1 -Credential $mycreds
-. .\Configure.ps1 -Credential $mycreds
+.\Cleanup.ps1 -Credential $mycreds
+.\Configure.ps1 -Credential $mycreds
 ```
 
 Of course, in real life, you might already get the password as a `SecureString`. You might also want to get the password from KeyVault.
@@ -90,8 +90,8 @@ Of course, in real life, you might already get the password as a `SecureString`.
 
 ```PowerShell
 $tenantId = "yourTenantIdGuid"
-. .\Cleanup.ps1 -TenantId $tenantId
-. .\Configure.ps1 -TenantId $tenantId
+.\Cleanup.ps1 -TenantId $tenantId
+.\Configure.ps1 -TenantId $tenantId
 ```
 
 #### Option 4 (non-interactive, and create apps in a specified tenant)
@@ -99,9 +99,9 @@ $tenantId = "yourTenantIdGuid"
 This option combines option 2 and option 3: it creates the application in a specific tenant. See option 3 for the way to get the tenant Id. Then run:
 
 ```PowerShell
-$secpasswd = ConvertTo-SecureString "[Password here]" -AsPlainText -Force
+$secpasswd = ConvertTo-SecureString�"[Password here]" -AsPlainText -Force
 $mycreds = New-Object System.Management.Automation.PSCredential ("[login@tenantName here]", $secpasswd)
 $tenantId = "yourTenantIdGuid"
-. .\Cleanup.ps1 -Credential $mycreds -TenantId $tenantId
-. .\Configure.ps1 -Credential $mycreds -TenantId $tenantId
+.\Cleanup.ps1 -Credential $mycreds -TenantId $tenantId
+.\Configure.ps1 -Credential $mycreds -TenantId $tenantId
 ```
