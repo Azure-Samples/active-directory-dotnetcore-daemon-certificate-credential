@@ -21,12 +21,35 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using TodoListService.Models;
 
-namespace TodoListServiceCore.Models
+namespace TodoListService_Core.Controllers
 {
-    public class TodoItem
+    [Authorize]
+    [Route("api/[controller]")]
+    public class TodoListController : Controller
     {
-        public string Title { get; set; }
-        public string Owner { get; set; }
+        static ConcurrentBag<TodoItem> todoBag = new ConcurrentBag<TodoItem>();
+
+        // GET: api/values
+        [HttpGet]
+        public IEnumerable<TodoItem> Get()
+        {
+            return todoBag;
+        }
+
+        // POST api/values
+        [HttpPost]
+        public void Post(TodoItem todo)
+        {
+            if (null != todo && !string.IsNullOrWhiteSpace(todo.Title))
+            {
+                todoBag.Add(new TodoItem { Title = todo.Title, Owner = "anybody"});
+            }
+        }
     }
 }
