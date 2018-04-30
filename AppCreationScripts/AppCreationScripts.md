@@ -34,10 +34,13 @@ To use the app creation scripts:
     ```PowerShell
     Set-ExecutionPolicy -Scope Process -ExecutionPolicy Unrestricted
     ```
-4. If you have never done it already, in the PowerShell window, install the AzureAD PowerShell modules. For this, type:
-    ```PowerShell
-    Install-Module AzureAD
-    ```
+4. If you have never done it already, in the PowerShell window, install the AzureAD PowerShell modules. For this:
+
+   1. Open PowerShell as admin (On Windows, Search Powershell in the search bar, right click on it and select Run as administrator).
+   2. Type:
+        ```PowerShell
+        Install-Module AzureAD
+        ```
 5. Go to the `AppCreationScripts` sub-folder. From the folder where you cloned the repo,
     ```PowerShell
     cd AppCreationScripts
@@ -99,7 +102,7 @@ $tenantId = "yourTenantIdGuid"
 This option combines option 2 and option 3: it creates the application in a specific tenant. See option 3 for the way to get the tenant Id. Then run:
 
 ```PowerShell
-$secpasswd = ConvertTo-SecureString "[Password here]" -AsPlainText -Force
+$secpasswd = ConvertTo-SecureStringÂ "[Password here]" -AsPlainText -Force
 $mycreds = New-Object System.Management.Automation.PSCredential ("[login@tenantName here]", $secpasswd)
 $tenantId = "yourTenantIdGuid"
 .\Cleanup.ps1 -Credential $mycreds -TenantId $tenantId
