@@ -86,7 +86,7 @@ namespace TodoListDaemonWithCert
 
             var builder = new ConfigurationBuilder()
              .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json");
+            .AddJsonFile(file);
 
             Configuration = builder.Build();
             return Configuration.Get<AuthenticationConfig>();
