@@ -32,7 +32,7 @@ To use the app creation scripts:
 2. Navigate to the root directory of the project.
 3. Until you change it, the default Execution Policy for scripts is usually `Restricted`. In order to run the PowerShell script you need to set the Execution Policy to `Unrestricted`. You can set this just for the current PowerShell process by running the command:
     ```PowerShell
-    Set-ExecutionPolicy -Scope Process -ExecutionPolicy Unrestricted
+    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
     ```
 4. If you have never done it already, in the PowerShell window, install the AzureAD PowerShell modules. For this:
 
@@ -56,9 +56,9 @@ You're done. this just works!
 We advise four ways of running the script:
 
 - Interactive: you will be prompted for credentials, and the scripts decide in which tenant to create the objects,
-- non-interactive: you will provide crendentials, and the scripts decide in which tenant to create the objects,
-- Interactive in specific tenant: you will be prompted for credentials, and the scripts decide in which tenant to create the objects,
-- non-interactive in specific tenant: you will provide crendentials, and the scripts decide in which tenant to create the objects.
+- non-interactive: you will provide credentials, and the scripts decide in which tenant to create the objects,
+- Interactive in specific tenant: you will provide tenant in which you want to create the objects and then you will be prompted for credentials, and the scripts will create the objects,
+- non-interactive in specific tenant: you will provide tenant in which you want to create the objects and credentials, and the scripts will create the objects.
 
 Here are the details on how to do this.
 
