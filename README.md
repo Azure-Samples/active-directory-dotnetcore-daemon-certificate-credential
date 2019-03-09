@@ -209,7 +209,7 @@ This project has one WebApp / Web API projects. To deploy them to Azure Web Site
 4. Switch to Visual Studio and go to the TodoListService project.  Right click on the project in the Solution Explorer and select Publish.  Click Import, and import the publish profile that you downloaded.
 5. On the Connection tab, update the Destination URL so that it is https, for example [https://TodoListService-contoso.azurewebsites.net](https://TodoListService-contoso.azurewebsites.net). Click Next.
 6. On the Settings tab, make sure Enable Organizational Authentication is NOT selected.  Click Publish.
-7. Visual Studio will publish the project and automatically open a browser to the URL of the project.  If you see the default web page of the project, the publication was successful.
+7. Visual Studio will publish the project and automatically open a browser to the URL of the project.
 
 ### Update the Active Directory tenant application registration for `TodoListService`
 
