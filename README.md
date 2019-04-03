@@ -10,7 +10,9 @@ endpoint: AAD V1
 # Authenticating to Azure AD in daemon apps with certificates
 
 ![Build Badge](https://identitydivision.visualstudio.com/_apis/public/build/definitions/a7934fdd-dcde-4492-a406-7fad6ac00e17/30/badge)
+<!--
 ![Test Badge](https://githuborgrepohealth.azurewebsites.net/api/TestBadge?id=3)
+-->
 
 > There's a newer version of this sample! Check it out: https://github.com/azure-samples/ms-identity-dotnetcore-daemon-console
 >
