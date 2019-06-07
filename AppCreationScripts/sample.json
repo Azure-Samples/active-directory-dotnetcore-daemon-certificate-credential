@@ -14,18 +14,17 @@
     {
       "Id": "service",
       "Name": "TodoListService-Core-Cert",
-      "IsPublicClient": false,
-      "Kind":"WebApi",
-      "IsAvailableToOtherTenants":false,
+      "Kind": "WebApi",
+      "IsAvailableToOtherTenants": false,
+      "Audience": "AzureADMyOrg",
       "HomePage": "https://localhost:44351/"
     },
     {
       "Id": "client",
       "Name": "TodoListDaemon-Core-Cert",
       "Certificate": "CN=TodoListDaemonWithCert",
-      "IsPublicClient": false,
-      "Kind":"Daemon",
-      "IsAvailableToOtherTenants":false,
+      "Kind": "Daemon",
+      "IsAvailableToOtherTenants": false,
       "Audience": "AzureADMyOrg",
       "UsesROPCOrIWA": false,
       "RequiredResourcesAccess": [
