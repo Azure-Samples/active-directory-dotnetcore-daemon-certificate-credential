@@ -178,7 +178,7 @@ namespace TodoListDaemonWithCert
             }
         }
 
-   
+
         /// <summary>
         /// Display the list of todo items by querying the todolist service
         /// </summary>
@@ -193,7 +193,7 @@ namespace TodoListDaemonWithCert
             // Call the To Do list service.
             Console.WriteLine("Retrieving To Do list at {0}", DateTime.Now.ToString());
             HttpResponseMessage response = await httpClient.GetAsync(config.TodoListBaseAddress + "/api/todolist");
-            
+
             if (response.IsSuccessStatusCode)
             {
                 // Read the response and output it to the console.

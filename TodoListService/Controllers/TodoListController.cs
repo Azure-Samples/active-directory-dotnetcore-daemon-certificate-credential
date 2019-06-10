@@ -41,34 +41,34 @@ namespace TodoListService_Core.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-			if (!ValidateAppRole())
-				return new UnauthorizedResult();
+            if (!ValidateAppRole())
+                return new UnauthorizedResult();
 
-			return new OkObjectResult(todoBag);
+            return new OkObjectResult(todoBag);
         }
 
-		// POST api/todolist
-		[HttpPost]
+        // POST api/todolist
+        [HttpPost]
         public IActionResult Post(TodoItem todo)
         {
-			if (!ValidateAppRole())
-				return new UnauthorizedResult();
+            if (!ValidateAppRole())
+                return new UnauthorizedResult();
 
             if (null != todo && !string.IsNullOrWhiteSpace(todo.Title))
             {
-                todoBag.Add(new TodoItem { Title = todo.Title, Owner = "anybody"});
+                todoBag.Add(new TodoItem { Title = todo.Title, Owner = "anybody" });
             }
 
-			return new OkResult();
+            return new OkResult();
         }
 
-		private bool ValidateAppRole()
-		{
-			//
-			// The `role` claim tells you what permissions the client application has in the service.
-			// In this case we look for a  `role` value of `access_as_application`
-			//
-			return User.HasClaim("roles", "access_as_application");
-		}
-	}
+        private bool ValidateAppRole()
+        {
+            //
+            // The `role` claim tells you what permissions the client application has in the service.
+            // In this case we look for a  `role` value of `access_as_application`
+            //
+            return User.HasClaim("roles", "access_as_application");
+        }
+    }
 }

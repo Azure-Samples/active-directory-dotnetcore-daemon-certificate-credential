@@ -21,7 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
- 
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -52,25 +52,25 @@ namespace TodoListService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-			// This is required to be instantiated before the OpenIdConnectOptions starts getting configured.
-			// By default, the claims mapping will map claim names in the old format to accommodate older SAML applications.
-			// 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role' instead of 'roles'
-			// This flag ensures that the ClaimsIdentity claims collection will be built from the claims in the token
-			JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
+            // This is required to be instantiated before the OpenIdConnectOptions starts getting configured.
+            // By default, the claims mapping will map claim names in the old format to accommodate older SAML applications.
+            // 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role' instead of 'roles'
+            // This flag ensures that the ClaimsIdentity claims collection will be built from the claims in the token
+            JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
 
-			services.AddAuthentication(sharedOptions =>
-			{
-				sharedOptions.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-			})
-			.AddAzureAdBearer(options => Configuration.Bind("AzureAd", options));
+            services.AddAuthentication(sharedOptions =>
+            {
+                sharedOptions.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddAzureAdBearer(options => Configuration.Bind("AzureAd", options));
 
-			services.Configure<OpenIdConnectOptions>(AzureADDefaults.OpenIdScheme, options =>
-			{
-				// The claim in the Jwt token where App roles are available.
-				options.TokenValidationParameters.RoleClaimType = "roles";
-			});
+            services.Configure<JwtBearerOptions>(AzureADDefaults.JwtBearerAuthenticationScheme, options =>
+            {
+                // The claim in the Jwt token where App roles are available.
+                options.TokenValidationParameters.RoleClaimType = "roles";
+            });
 
-			services.AddMvc();
+            services.AddMvc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
