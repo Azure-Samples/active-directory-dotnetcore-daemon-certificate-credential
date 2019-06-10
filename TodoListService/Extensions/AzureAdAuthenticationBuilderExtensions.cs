@@ -19,7 +19,7 @@ namespace Microsoft.AspNetCore.Authentication
             return builder;
         }
 
-        private class ConfigureAzureOptions: IConfigureNamedOptions<JwtBearerOptions>
+        private class ConfigureAzureOptions : IConfigureNamedOptions<JwtBearerOptions>
         {
             private readonly AzureAdOptions _azureOptions;
 

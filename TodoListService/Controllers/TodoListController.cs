@@ -25,6 +25,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
 using TodoListService.Models;
 
 namespace TodoListService_Core.Controllers
@@ -35,21 +37,38 @@ namespace TodoListService_Core.Controllers
     {
         static ConcurrentBag<TodoItem> todoBag = new ConcurrentBag<TodoItem>();
 
-        // GET: api/values
+        // GET: api/todolist
         [HttpGet]
-        public IEnumerable<TodoItem> Get()
+        public IActionResult Get()
         {
-            return todoBag;
+            if (!ValidateAppRole())
+                return new UnauthorizedResult();
+
+            return new OkObjectResult(todoBag);
         }
 
-        // POST api/values
+        // POST api/todolist
         [HttpPost]
-        public void Post(TodoItem todo)
+        public IActionResult Post(TodoItem todo)
         {
+            if (!ValidateAppRole())
+                return new UnauthorizedResult();
+
             if (null != todo && !string.IsNullOrWhiteSpace(todo.Title))
             {
-                todoBag.Add(new TodoItem { Title = todo.Title, Owner = "anybody"});
+                todoBag.Add(new TodoItem { Title = todo.Title, Owner = "anybody" });
             }
+
+            return new OkResult();
+        }
+
+        private bool ValidateAppRole()
+        {
+            //
+            // The `role` claim tells you what permissions the client application has in the service.
+            // In this case we look for a  `role` value of `access_as_application`
+            //
+            return User.HasClaim("roles", "access_as_application");
         }
     }
 }

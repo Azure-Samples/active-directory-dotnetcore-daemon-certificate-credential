@@ -3,7 +3,8 @@
     "Title": "A .NET Core daemon application that uses a certificate to authenticate with Azure AD and get OAuth 2.0 access tokens to an ASP.NET Core 2.0 Web API",
     "Level": 200,
     "Client": ".NET Core Desktop",
-    "Service": "ASP.NET Core Web API"
+    "Service": "ASP.NET Core Web API",
+    "RepositoryUrl": "active-directory-dotnetcore-daemon-certificate-credential"
   },
 
   /*
@@ -12,19 +13,24 @@
   "AADApps": [
     {
       "Id": "service",
-      "Name": "TodoListService",
-      "IsPublicClient": false,
+      "Name": "TodoListService-Core-Cert",
+      "Kind": "WebApi",
+      "IsAvailableToOtherTenants": false,
+      "Audience": "AzureADMyOrg",
       "HomePage": "https://localhost:44351/"
     },
     {
       "Id": "client",
-      "Name": "TodoListDaemon",
+      "Name": "TodoListDaemon-Core-Cert",
       "Certificate": "CN=TodoListDaemonWithCert",
-      "IsPublicClient": false,
+      "Kind": "Daemon",
+      "IsAvailableToOtherTenants": false,
+      "Audience": "AzureADMyOrg",
+      "UsesROPCOrIWA": false,
       "RequiredResourcesAccess": [
         {
           "Resource": "service",
-          "DelegatedPermissions": [ "user_impersonation" ]
+          "ApplicationPermissions": [ "access_as_application" ]
         }
       ]
     }

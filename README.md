@@ -50,68 +50,148 @@ To run this sample, you'll need:
 - [Visual Studio 2017](https://aka.ms/vsdownload) or another editor. See [Get Started with .NET Core](https://www.microsoft.com/net/core#windowsvs2017) for the list of tools you might want to use depending on your platform
 - An Internet connection
 - An Azure Active Directory (Azure AD) tenant. For more information on how to get an Azure AD tenant, see [How to get an Azure AD tenant](https://azure.microsoft.com/en-us/documentation/articles/active-directory-howto-tenant/)
-- A user account in your Azure AD tenant. This sample will not work with a Microsoft account (formerly Windows Live account). Therefore, if you signed in to the [Azure portal](https://portal.azure.com) with a Microsoft account and have never created a user account in your directory before, you need to do that now.
+- A user account that is a **global admin of your Azure AD tenant**. This sample will not work with a Microsoft account (formerly Windows Live account). Therefore, if you signed in to the [Azure portal](https://portal.azure.com) with a Microsoft account and have never created a user account in your directory before, you need to do that now.
 
 ### Step 1:  Clone or download this repository
 
-You can clone this repository from Visual Studio. Alternatively, from your shell or command line, use:
+YFrom your shell or command line:
 
-`git clone https://github.com/Azure-Samples/active-directory-dotnetcore-daemon-certificate-credential.git`
+```Shell
+git clone https://github.com/Azure-Samples/active-directory-dotnetcore-daemon-certificate-credential.git
+```
 
-> Given that the name of the sample is pretty long, and so are the name of the referenced NuGet pacakges, you might want to clone it in a folder close to the root of your hard drive, to avoid file size limitations on Windows.
+or download and exact the repository .zip file.
+
+> Given that the name of the sample is pretty long, and so are the name of the referenced NuGet packages, you might want to clone it in a folder close to the root of your hard drive, to avoid file size limitations on Windows.
 
 ### Step 2:  Register the sample with your Azure Active Directory tenant, create a certificate, and configure the code
 
 There are two projects in this sample. Each needs to be separately registered in your Azure AD tenant. To register these projects, you can:
 
-- either follow the steps in the paragraphs below ([Step 2](#step-2--register-the-sample-with-your-azure-active-directory-tenant) and [Step 3](#step-3--configure-the-sample-to-use-your-azure-ad-tenant))
+- either follow the steps [Step 2: Register the sample with your Azure Active Directory tenant](#step-2-register-the-sample-with-your-azure-active-directory-tenant) and [Step 3:  Configure the sample to use your Azure AD tenant](#choose-the-azure-ad-tenant-where-you-want-to-create-your-applications)
 - or use PowerShell scripts that:
-  - **automatically** create for you the Azure AD applications and related objects (passwords, permissions, dependencies)
+  - **automatically** creates the Azure AD applications and related objects (passwords, permissions, dependencies) for you
   - modify the Visual Studio projects' configuration files.
 
-If you want to use this automation, read the instructions in [App Creation Scripts](./AppCreationScripts/AppCreationScripts.md)
+If you want to use this automation:
+1. On Windows run PowerShell and navigate to the root of the cloned directory
+1. In PowerShell run:
+   ```PowerShell
+   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process -Force
+   ```
+1. Run the script to create your Azure AD application and configure the code of the sample application accordingly.
+   ```PowerShell
+   .\AppCreationScripts\Configure.ps1
+   ```
+   > Other ways of running the scripts are described in [App Creation Scripts](./AppCreationScripts/AppCreationScripts.md)
 
-> For Windows Server 2012, creating a certificate with PowerShell is slightly different: See issue [#37](https://github.com/Azure-Samples/active-directory-dotnet-daemon-certificate-credential/issues/37)
+1. Open the Visual Studio solution and click start
 
-#### First step: choose the Azure AD tenant where you want to create your applications
+If you don't want to use this automation, follow the steps below
+
+#### Choose the Azure AD tenant where you want to create your applications
 
 As a first step you'll need to:
 
-1. Sign in to the [Azure portal](https://portal.azure.com).
-1. On the top bar, click on your account and under the **Directory** list, choose the Active Directory tenant where you wish to register your application.
-1. Click on **All services** in the left-hand nav, and choose **Azure Active Directory**.
+1. Sign in to the [Azure portal](https://portal.azure.com) using either a work or school account or a personal Microsoft account.
+1. If your account is present in more than one Azure AD tenant, select your profile at the top right corner in the menu on top of the page, and then **switch directory**.
+   Change your portal session to the desired Azure AD tenant.
 
-> In the next steps, you might need the tenant name (or directory name) or the tenant ID (or directory ID). These are presented in the **Properties**
-  of the Azure Active Directory window respectively as *Name* and *Directory ID*
+#### Register the service app (TodoListService-Core-Cert)
 
-#### Register the service app (TodoListService)
+1. Navigate to the Microsoft identity platform for developers [App registrations](https://go.microsoft.com/fwlink/?linkid=2083908) page.
+1. Select **New registration**.
+1. When the **Register an application page** appears, enter your application's registration information:
+   - In the **Name** section, enter a meaningful application name that will be displayed to users of the app, for example `TodoListService-Core-Cert`.
+   - Change **Supported account types** to **Accounts in this organizational directory only**.
+1. Select **Register** to create the application.
+1. On the app **Overview** page, find the **Application (client) ID** value and record it for later. You'll need it to configure the Visual Studio configuration file for this project.
 
-1. In the  **Azure Active Directory** pane, click on **App registrations** and choose **New application registration**.
-1. Enter a friendly name for the application, for example 'TodoListService' and select 'Web app / API' as the *Application Type*.
-1. For the *sign-on URL*, enter the base URL for the sample, which is by default `https://localhost:44351/`.
-1. Click on **Create** to create the application.
-1. In the succeeding page, Find the *Application ID* value and copy it to the clipboard. You'll need it to configure the Visual Studio configuration file for this project.
+1. Select the **Expose an API** section, and:
+   - Select **Add a scope**
+   - accept the proposed Application ID URI (api://{clientId}) by selecting **Save and Continue**
+   - Enter the following parameters
+     - for **Scope name** use `access_as_application`
+     - Keep **Admins and users** for **Who can consent**
+     - in **Admin consent display name** type `Access TodoListService-Core-Cert as an application`
+     - in **Admin consent description** type `Accesses the TodoListService-Core-Cert Web API as an application`
+     - in **User consent display name** type `Access TodoListService-Core-Cert as an application`
+     - in **User consent description** type `Accesses the TodoListService-Core-Cert Web API as an application`
+     - Keep **State** as **Enabled**
+     - Select **Add scope**
 
-#### Register the client app (TodoListDaemon-Core)
+#### Secure your Web API by defining Application Roles (permission)
 
-1. In the  **Azure Active Directory** pane, click on **App registrations** and choose **New application registration**.
-1. Enter a friendly name for the application, for example 'TodoListDaemon' and select 'Web app / API' as the *Application Type*.
-   > Even if this is a desktop application, this is a confidential client application hence the Application Type
-1. For the *sign-on URL*, enter `https://<your_tenant_name>/TodoListDaemon`, replacing `<your_tenant_name>` with the name of your Azure AD tenant.
-1. Click on **Create** to create the application.
-1. In the succeeding page, Find the *Application ID* value and copy it to the clipboard. You'll need it to configure the Visual Studio configuration file for this project.
+If you don't do anything more, Azure AD will provide a token for any daemon application (using the client credential flow) requesting an access token for your Web API (for its App ID URI)
+
+In this step we are going to ensure that Azure AD only provides a token to the applications to which the Tenant admin grants consent. We are going to limit the access to our TodoList client by defining authorizations
+
+##### Add an app role to the manifest
+
+1. While still in the blade for your  application, click **Manifest**.
+1. Edit the manifest by locating the `appRoles` setting and adding an application roles. The role definition is provided in the JSON block below.  Leave the `allowedMemberTypes` to "Application" only.
+1. Save the manifest.
+
+The content of `appRoles` should be the following (the `id` can be any unique GUID)
+
+```JSon
+"appRoles": [
+	{
+	"allowedMemberTypes": [ "Application" ],
+	"description": "Accesses the TodoListService-Core-Cert as an application.",
+	"displayName": "access_as_application",
+	"id": "ccf784a6-fd0c-45f2-9c08-2f9d162a0628",
+	"isEnabled": true,
+	"lang": null,
+	"origin": "Application",
+	"value": "access_as_application"
+	}
+],
+```
+
+##### Ensure that tokens Azure AD issues tokens for your Web API only to allowed clients
+
+The Web API tests for the app role (that's the developer way of doing it). But you can even ask Azure Active Directory to issue a token for your Web API only to applications which were approved by the tenant admin. For this:
+
+1. On the app **Overview** page for your app registration, select the hyperlink with the name of your application in **Managed application in local directory** (note this field title can be truncated for instance Managed application in ...)
+
+   > When you select this link you will navigate to the **Enterprise Application Overview** page associated with the service principal for your application in the tenant where you created it. You can navigate back to the app registration page by using the back button of your browser.
+
+1. Select the **Properties** page in the **Manage** section of the Enterprise application pages
+1. If you want AAD to enforce access to your Web API from only certain clients, set **User assignment required?** to **Yes**.
+
+   > **Important security tip**
+   >
+   > By setting **User assignment required?** to **Yes**, AAD will check the app role assignments of the clients when they request an access token for the Web API (see app permissions below). If the client was not be assigned to any AppRoles, AAD would just return `invalid_client: AADSTS501051: Application xxxx is not assigned to a role for the xxxx`
+   >
+   > If you keep **User assignment required?** to **No**, <span style='background-color:yellow; display:inline'>Azure AD  won’t check the app role assignments when a client requests an access token to your Web API</span>. Therefore, any daemon client (that is any client using client credentials flow) would be able to obtain the access token for the  Web API just by specifying its audience (App ID URi). Now, there is a second level of security as your Web API can, as is done in this sample, verify that the application has the right role (which was authorized by the tenant admin). It does it by validating that the access token has a `roles` claim, and that this claims contains `access_as_application`.
+
+1. Select **Save**
+
+#### Register the client app (TodoListDaemon-Core-Cert)
+
+1. Navigate to the Microsoft identity platform for developers [App registrations](https://go.microsoft.com/fwlink/?linkid=2083908) page.
+1. Select **New registration**.
+1. When the **Register an application page** appears, enter your application's registration information:
+   - In the **Name** section, enter a meaningful application name that will be displayed to users of the app, for example `TodoListDaemon-Core-Cert`.
+   - Leave **Supported account types** on the default setting of **Accounts in this organizational directory only**.
+   - In the Redirect URI (optional) section, select **Web** in the combo-box.
+      > Even if this is a desktop application, this is a confidential client application hence the *Application Type* being 'Web', which might seem counter intuitive.
+   - For the Redirect URI*, enter `https://<your_tenant_name>/TodoListDaemon-Core-Cert`, replacing `<your_tenant_name>` with the name of your Azure AD tenant.
+1. Select **Register** to create the application.
+1. On the app **Overview** page, find the **Application (client) ID** value and record it for later. You'll need it to configure the Visual Studio configuration file for this project.
 
 #### Create a self-signed certificate
 
 To complete this step, you will use the `New-SelfSignedCertificate` Powershell command. You can find more information about the New-SelfSignedCertificat command [here](https://docs.microsoft.com/en-us/powershell/module/pkiclient/new-selfsignedcertificate).
 
-Open PowerShell and run `New-SelfSignedCertificate` with the following parameters to create a self-signed certificate in the user certificate store on your computer:
+1. Open PowerShell and run New-SelfSignedCertificate with the following parameters to create a self-signed certificate in the user certificate store on your computer:
 
 ```PowerShell
 $cert=New-SelfSignedCertificate -Subject "CN=TodoListDaemonWithCert" -CertStoreLocation "Cert:\CurrentUser\My"  -KeyExportPolicy Exportable -KeySpec Signature
 ```
 
-If needed, you can later export this certificate using the "Manage User Certificate" MMC snap-in accessible from the Windows Control Panel. You can also add other options to generate the certificate in a different
+1. If needed, you can later export  this certificate using the "Manage User Certificate" MMC snap-in accessible from the Windows Control Panel. You can also add other options to generate the certificate in a different
 store such as the Computer or service store (See [How to: View Certificates with the MMC Snap-in](https://docs.microsoft.com/en-us/dotnet/framework/wcf/feature-details/how-to-view-certificates-with-the-mmc-snap-in)).
 
 #### Add the certificate as a key for the TodoListDaemon application in Azure AD
@@ -146,8 +226,9 @@ The content of the generated "keyCredentials.txt" file has the following schema:
 
 ##### Associate the certificate credentials with the Azure AD Application
 
-To associate the certificate credential with the  `TodoListDaemon` app object in Azure AD, you'll need to edit the application manifest. In the Azure portal app registrations for the  click on **Manifest**. An editor opens enabling you to edit the manifest.
-You need to replace the value of the `keyCredentials` property (that is `[]` if you don't have any certificate credentials yet), with the content of the keyCredential.txt file
+To associate the certificate credential with the `TodoListDaemon-Core-Cert` app object in Azure AD, you'll need to edit the application manifest.
+In the Azure portal app registration page for the `TodoListDaemon-Core-Cert`, click on **Manifest**. An editor window opens enabling you to edit the manifest.
+You need to replace the value of the `keyCredentials` property (that is `[]` if you don't have any certificate credentials yet), with the content of the keyCredential.txt file.
 
 To do this replacement in the manifest, you have two options:
 
@@ -157,9 +238,18 @@ To do this replacement in the manifest, you have two options:
 - Option 2: **Download** the manifest to your computer, edit it with your favorite text editor, save a copy of it, and **Upload** this copy. You might want to choose this option if you want to keep track of the history of the manifest.
 
 Note that the `keyCredentials` property is multi-valued, so you may upload multiple certificates for richer key management. In that case copy only the text between the curly brackets.
+1. Select the **API permissions** section
+   - Click the **Add a permission** button and then,
+   - Ensure that the **My APIs** tab is selected
+   - In the list of APIs, select the API `TodoListService-Core-Cert`.
+   - In the **Application permissions** section, ensure that the right permissions are checked: **access_as_application**
+   - Select the **Add permissions** button
 
-1. Configure Permissions for your application. To that extent, in the Settings menu, choose the 'Required permissions' section and then,
-   click on **Add**, then **Select an API**, and type `TodoListService` in the textbox. Then, click on  **Select Permissions** and select **Access 'TodoListService'**.
+1. At this stage permissions are assigned correctly but the client app does not allow interaction. 
+   Therefore no consent can be presented via a UI and accepted to use the service app. 
+   Click the **Grant/revoke admin consent for {tenant}** button, and then select **Yes** when you are asked if you want to grant consent for the
+   requested permissions for all account in the tenant.
+   You need to be an Azure AD tenant admin to do this.
 
 ### Step 3:  Configure the sample to use your Azure AD tenant
 
@@ -238,7 +328,7 @@ Also, if you increase the instance count of the web site, requests will be distr
 
 ## About the Code
 
-### Code for the client
+### Client side: the daemon app
 
 The code acquiring a token is entirely located in the `TodoListDaemonWithCert-Core\Program.cs` file.
 The `AuthenticationContext` is created line 55
@@ -264,6 +354,25 @@ This token is then used as a bearer token to call the Web API (line 164 and 194)
 
 ```CSharp
 httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken)
+```
+
+### Service side: how we protected the API
+
+On the service side, the code directing .NET to validate the access token is in `AzureAdServiceCollectionExtensions.cs`. It only validates the audience of the application (the App ID URI) by setting `JwtBearerOptions` properties.
+
+```CSharp
+public void Configure(string name, JwtBearerOptions options)
+{
+    options.Audience = _azureOptions.ClientId;
+    options.Authority = $"{_azureOptions.Instance}{_azureOptions.TenantId}";
+}
+```
+
+However, the controllers also validate that the client has a `roles` claim of value `access_as_application`. It returns an Unauthorized result otherwise.
+
+```CSharp
+if (!User.HasClaim("roles", "access_as_application"))
+    return new UnauthorizedResult();
 ```
 
 ## How to recreate this sample
@@ -302,9 +411,11 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 
 For more information, see ADAL.NET's conceptual documentation:
 
+- [ADAL.NET's conceptual documentation](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet/wiki)
 - [Client credential flows](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet/wiki/Client-credential-flows)
 - [Using the acquired token to call a protected Web API](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet/wiki/Using-the-acquired-token-to-call-a-protected-Web-API)
 - [Customizing Token cache serialization](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet/wiki/Token-cache-serialization)
+- [How to: Add app roles in your application and receive them in the token](https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-add-app-roles-in-azure-ad-apps)
 
 For more information about how OAuth 2.0 protocols work in this scenario and other scenarios, see [Authentication Scenarios for Azure AD](http://go.microsoft.com/fwlink/?LinkId=394414).
 
