@@ -107,19 +107,6 @@ As a first step you'll need to:
 1. Select **Register** to create the application.
 1. On the app **Overview** page, find the **Application (client) ID** value and record it for later. You'll need it to configure the Visual Studio configuration file for this project.
 
-1. Select the **Expose an API** section, and:
-   - Select **Add a scope**
-   - accept the proposed Application ID URI (api://{clientId}) by selecting **Save and Continue**
-   - Enter the following parameters
-     - for **Scope name** use `access_as_application`
-     - Keep **Admins and users** for **Who can consent**
-     - in **Admin consent display name** type `Access TodoListService-Core-Cert as an application`
-     - in **Admin consent description** type `Accesses the TodoListService-Core-Cert Web API as an application`
-     - in **User consent display name** type `Access TodoListService-Core-Cert as an application`
-     - in **User consent description** type `Accesses the TodoListService-Core-Cert Web API as an application`
-     - Keep **State** as **Enabled**
-     - Select **Add scope**
-
 #### Secure your Web API by defining Application Roles (permission)
 
 If you don't do anything more, Azure AD will provide a token for any daemon application (using the client credential flow) requesting an access token for your Web API (for its App ID URI)
