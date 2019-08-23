@@ -20,19 +20,6 @@ param(
 # Adds the requiredAccesses (expressed as a pipe separated string) to the requiredAccess structure
 # The exposed permissions are in the $exposedPermissions collection, and the type of permission (Scope | Role) is 
 # described in $permissionType
-Function CreateAppRole([string] $Name, [string] $Description)
-{
-    $appRole = New-Object Microsoft.Open.AzureAD.Model.AppRole
-    $appRole.AllowedMemberTypes = New-Object System.Collections.Generic.List[string]
-    $appRole.AllowedMemberTypes.Add("Application");
-    $appRole.DisplayName = $Name
-    $appRole.Id = New-Guid
-    $appRole.IsEnabled = $true
-    $appRole.Description = $Description
-    $appRole.Value = $Name;
-    return $appRole
-}
-
 Function AddResourcePermission($requiredAccess, `
                                $exposedPermissions, [string]$requiredAccesses, [string]$permissionType)
 {
@@ -52,7 +39,7 @@ Function AddResourcePermission($requiredAccess, `
 }
 
 #
-# Exemple: GetRequiredPermissions "Microsoft Graph"  "Graph.Read|User.Read"
+# Example: GetRequiredPermissions "Microsoft Graph"  "Graph.Read|User.Read"
 # See also: http://stackoverflow.com/questions/42164581/how-to-configure-a-new-azure-ad-application-through-powershell
 Function GetRequiredPermissions([string] $applicationDisplayName, [string] $requiredDelegatedPermissions, [string]$requiredApplicationPermissions, $servicePrincipal)
 {
@@ -87,12 +74,12 @@ Function GetRequiredPermissions([string] $applicationDisplayName, [string] $requ
 
 Function UpdateLine([string] $line, [string] $value)
 {
-    $index = $line.IndexOf(':')
-    $delimiter = ','
+    $index = $line.IndexOf('=')
+    $delimiter = ';'
     if ($index -eq -1)
     {
-        $index = $line.IndexOf('=')
-        $delimiter = ';'
+        $index = $line.IndexOf(':')
+        $delimiter = ','
     }
     if ($index -ige 0)
     {
@@ -120,6 +107,43 @@ Function UpdateTextFile([string] $configFilePath, [System.Collections.HashTable]
 
     Set-Content -Path $configFilePath -Value $lines -Force
 }
+<#.Description
+   This function creates a new Azure AD scope (OAuth2Permission) with default and provided values
+#>  
+Function CreateScope( [string] $value, [string] $userConsentDisplayName, [string] $userConsentDescription, [string] $adminConsentDisplayName, [string] $adminConsentDescription)
+{
+    $scope = New-Object Microsoft.Open.AzureAD.Model.OAuth2Permission
+    $scope.Id = New-Guid
+    $scope.Value = $value
+    $scope.UserConsentDisplayName = $userConsentDisplayName
+    $scope.UserConsentDescription = $userConsentDescription
+    $scope.AdminConsentDisplayName = $adminConsentDisplayName
+    $scope.AdminConsentDescription = $adminConsentDescription
+    $scope.IsEnabled = $true
+    $scope.Type = "User"
+    return $scope
+}
+
+<#.Description
+   This function creates a new Azure AD AppRole with default and provided values
+#>  
+Function CreateAppRole([string] $types, [string] $name, [string] $description)
+{
+    $appRole = New-Object Microsoft.Open.AzureAD.Model.AppRole
+    $appRole.AllowedMemberTypes = New-Object System.Collections.Generic.List[string]
+    $typesArr = $types.Split(',')
+    foreach($type in $typesArr)
+    {
+        $appRole.AllowedMemberTypes.Add($type);
+    }
+    $appRole.DisplayName = $name
+    $appRole.Id = New-Guid
+    $appRole.IsEnabled = $true
+    $appRole.Description = $description
+    $appRole.Value = $name;
+    return $appRole
+}
+
 
 Set-Content -Value "<html><body><table>" -Path createdApps.html
 Add-Content -Value "<thead><tr><th>Application</th><th>AppId</th><th>Url in the Azure portal</th></tr></thead><tbody>" -Path createdApps.html
@@ -131,6 +155,8 @@ Function ConfigureApplications
    configuration files in the client and service project  of the visual studio solution (App.Config and Web.Config)
    so that they are consistent with the Applications parameters
 #> 
+
+    $commonendpoint = "common"
 
     # $tenantId is the Active Directory Tenant. This is a GUID which represents the "Directory ID" of the AzureAD tenant
     # into which you want to create the apps. Look it up in the Azure portal in the "Properties" of the Azure AD.
@@ -164,19 +190,11 @@ Function ConfigureApplications
     # Get the user running the script
     $user = Get-AzureADUser -ObjectId $creds.Account.Id
 
-    $accessasadminrole = CreateAppRole -Name "access_as_application" -Description  "Accesses the TodoListService-Core-Cert as an application."
-
-    $appRoles = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.AppRole]
-    $appRoles.Add($accessasadminrole)
-
    # Create the service AAD application
    Write-Host "Creating the AAD application (TodoListService-Core-Cert)"
    $serviceAadApplication = New-AzureADApplication -DisplayName "TodoListService-Core-Cert" `
                                                    -HomePage "https://localhost:44351/" `
-                                                   -AvailableToOtherTenants $True `
-                                                   -PublicClient $False `
-                                                   -AppRoles $appRoles 
-
+                                                   -PublicClient $False
    $serviceIdentifierUri = 'api://'+$serviceAadApplication.AppId
    Set-AzureADApplication -ObjectId $serviceAadApplication.ObjectId -IdentifierUris $serviceIdentifierUri
 
@@ -187,9 +205,46 @@ Function ConfigureApplications
    $owner = Get-AzureADApplicationOwner -ObjectId $serviceAadApplication.ObjectId
    if ($owner -eq $null)
    { 
-    Add-AzureADApplicationOwner -ObjectId $serviceAadApplication.ObjectId -RefObjectId $user.ObjectId
-    Write-Host "'$($user.UserPrincipalName)' added as an application owner to app '$($serviceServicePrincipal.DisplayName)'"
+        Add-AzureADApplicationOwner -ObjectId $serviceAadApplication.ObjectId -RefObjectId $user.ObjectId
+        Write-Host "'$($user.UserPrincipalName)' added as an application owner to app '$($serviceServicePrincipal.DisplayName)'"
    }
+
+   # Add application Roles
+   $appRoles = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.AppRole]
+   $newRole = CreateAppRole -types "Application" -name "access_as_application" -description "Accesses the TodoListService-Core-Cert as an application."
+   $appRoles.Add($newRole)
+   Set-AzureADApplication -ObjectId $serviceAadApplication.ObjectId -AppRoles $appRoles
+
+    # rename the user_impersonation scope if it exists to match the readme steps or add a new scope
+    $scopes = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.OAuth2Permission]
+   
+    if ($scopes.Count -ge 0) 
+    {
+        # add all existing scopes first
+        $serviceAadApplication.Oauth2Permissions | foreach-object { $scopes.Add($_) }
+
+        $scope = $serviceAadApplication.Oauth2Permissions | Where-Object { $_.Value -eq "User_impersonation" }
+
+        if ($scope -ne $null) 
+        {
+            $scope.Value = "access_as_user"
+        }
+        else 
+        {
+            # Add scope
+            $scope = CreateScope -value "access_as_user"  `
+                -userConsentDisplayName "Access TodoListService-Core-Cert"  `
+                -userConsentDescription "Allow the application to access TodoListService-Core-Cert on your behalf."  `
+                -adminConsentDisplayName "Access TodoListService-Core-Cert"  `
+                -adminConsentDescription "Allows the app to have the same access to information in the directory on behalf of the signed-in user."
+            
+            $scopes.Add($scope)
+        }        
+    }
+     
+    # add/update scopes
+    Set-AzureADApplication -ObjectId $serviceAadApplication.ObjectId -OAuth2Permission $scopes
+
 
    Write-Host "Done creating the service application (TodoListService-Core-Cert)"
 
@@ -206,7 +261,7 @@ Function ConfigureApplications
 
    # Generate a certificate
    Write-Host "Creating the client application (TodoListDaemon-Core-Cert)"
-   $certificate=New-SelfSignedCertificate -Subject CN=TodoListDaemonWithCert `
+   $certificate=New-SelfSignedCertificate -Subject CN=TodoListDaemonCoreCert `
                                            -CertStoreLocation "Cert:\CurrentUser\My" `
                                            -KeyExportPolicy Exportable `
                                            -KeySpec Signature
@@ -216,7 +271,7 @@ Function ConfigureApplications
 
    # Add a Azure Key Credentials from the certificate for the daemon application
    $clientKeyCredentials = New-AzureADApplicationKeyCredential -ObjectId $clientAadApplication.ObjectId `
-                                                                    -CustomKeyIdentifier "CN=TodoListDaemonWithCert" `
+                                                                    -CustomKeyIdentifier "CN=TodoListDaemonCoreCert" `
                                                                     -Type AsymmetricX509Cert `
                                                                     -Usage Verify `
                                                                     -Value $certBase64Value `
@@ -230,9 +285,11 @@ Function ConfigureApplications
    $owner = Get-AzureADApplicationOwner -ObjectId $clientAadApplication.ObjectId
    if ($owner -eq $null)
    { 
-    Add-AzureADApplicationOwner -ObjectId $clientAadApplication.ObjectId -RefObjectId $user.ObjectId
-    Write-Host "'$($user.UserPrincipalName)' added as an application owner to app '$($clientServicePrincipal.DisplayName)'"
+        Add-AzureADApplicationOwner -ObjectId $clientAadApplication.ObjectId -RefObjectId $user.ObjectId
+        Write-Host "'$($user.UserPrincipalName)' added as an application owner to app '$($clientServicePrincipal.DisplayName)'"
    }
+
+
 
    Write-Host "Done creating the client application (TodoListDaemon-Core-Cert)"
 
@@ -263,22 +320,17 @@ Function ConfigureApplications
    # Update config file for 'client'
    $configFile = $pwd.Path + "\..\TodoListDaemonWithCert-Core\appsettings.json"
    Write-Host "Updating the sample code ($configFile)"
-   $dictionary = @{ "Tenant" = $tenantName; "ClientId" = $clientAadApplication.AppId; "CertName" = "CN=TodoListDaemonWithCert"; "TodoListResourceId" = $serviceAadApplication.AppId;"TodoListBaseAddress" = $serviceAadApplication.HomePage };
+   $dictionary = @{ "Tenant" = $tenantName;"ClientId" = $clientAadApplication.AppId;"CertName" = "CN=TodoListDaemonCoreCert";"TodoListResourceId" = $serviceAadApplication.AppId;"TodoListBaseAddress" = $serviceAadApplication.HomePage };
    UpdateTextFile -configFilePath $configFile -dictionary $dictionary
-
-   $servicePropertyBladeUrl = "https://portal.azure.com/#blade/Microsoft_AAD_IAM/ManagedAppMenuBlade/Properties/objectId/"+$serviceServicePrincipal.ObjectId+"/appId/"+$serviceAadApplication.AppId
-
    Write-Host ""
-   Write-Host -ForegroundColor Green "------------------------------------------------------------------------------------------------"
-   Write-Host -ForegroundColor Yellow "IMPORTANT: Please follow the instructions below to complete a few manual step(s) in the Azure portal":
-   Write-Host "- For 'TodoListService-Core-Cert'"
-   Write-Host "  - Navigate to Properties tab: '$servicePropertyBladeUrl'"
-   Write-Host "  - Set 'User assignment required' to 'Yes'"
-   Write-Host "- For 'TodoListService-Core-Cert'"
-   Write-Host "  - Navigate to API Permisions: '$clientPortalUrl'"
-   Write-Host "  - Click on 'Grant admin consent for (your tenant)'."
-   Write-Host -ForegroundColor Green "------------------------------------------------------------------------------------------------"
+   Write-Host -ForegroundColor Green "------------------------------------------------------------------------------------------------" 
+   Write-Host "IMPORTANT: Please follow the instructions below to complete a few manual step(s) in the Azure portal":
+   Write-Host "- For 'client'"
+   Write-Host "  - Navigate to '$clientPortalUrl'"
+   Write-Host "  - Navigate to the 'Api Permissions' blade of the TodoListDaemon-Core-Cert app and grant admin consent" -ForegroundColor Red 
 
+   Write-Host -ForegroundColor Green "------------------------------------------------------------------------------------------------" 
+     
    Add-Content -Value "</tbody></table></body></html>" -Path createdApps.html  
 }
 

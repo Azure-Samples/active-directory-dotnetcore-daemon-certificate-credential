@@ -1,10 +1,11 @@
 {
   "Sample": {
-    "Title": "A .NET Core daemon application that uses a certificate to authenticate with Azure AD and get OAuth 2.0 access tokens to an ASP.NET Core 2.0 Web API",
+    "Title": "A .NET Core daemon application that uses a certificate to authenticate with Azure AD and gets an access tokens for an ASP.NET Core Web API",
     "Level": 200,
     "Client": ".NET Core Desktop",
     "Service": "ASP.NET Core Web API",
-    "RepositoryUrl": "active-directory-dotnetcore-daemon-certificate-credential"
+    "RepositoryUrl": "active-directory-dotnetcore-daemon-certificate-credential",
+    "Endpoint": "AAD v1"
   },
 
   /*
@@ -16,13 +17,20 @@
       "Name": "TodoListService-Core-Cert",
       "Kind": "WebApi",
       "IsAvailableToOtherTenants": false,
+      "AppRoles": [
+        {
+          "Types": [ "Application" ],
+          "Name": "access_as_application",
+          "Description": "Accesses the TodoListService-Core-Cert as an application."
+        }
+      ],
       "Audience": "AzureADMyOrg",
       "HomePage": "https://localhost:44351/"
     },
     {
       "Id": "client",
       "Name": "TodoListDaemon-Core-Cert",
-      "Certificate": "CN=TodoListDaemonWithCert",
+      "Certificate": "CN=TodoListDaemonCoreCert",
       "Kind": "Daemon",
       "IsAvailableToOtherTenants": false,
       "Audience": "AzureADMyOrg",
@@ -31,6 +39,11 @@
         {
           "Resource": "service",
           "ApplicationPermissions": [ "access_as_application" ]
+        }
+      ],
+      "ManualSteps": [
+        {
+          "Comment": "Navigate to the 'Api Permissions' blade of the TodoListDaemon-Core-Cert app and grant admin consent"
         }
       ]
     }
